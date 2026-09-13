@@ -1,0 +1,194 @@
+/* Transición entre vistas.
+   CV → Portafolio: glitch. Portafolio → CV: fundido limpio, sin glitch.
+   La duración la inyecta el componente en --glitch-duracion; aquí solo se
+   consume. */
+
+/* --- fundido limpio ---------------------------------------------------- */
+
+@keyframes fundido-entrada {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fundido-entrada {
+  animation: fundido-entrada var(--glitch-duracion, 350ms) ease-out both;
+}
+
+/* --- aberración cromática ---------------------------------------------- */
+
+/* Va sobre el contenedor del contenido, que es transparente: así el
+   desplazamiento de canales sigue el trazo real del texto y los bordes en
+   vez de recortar un rectángulo opaco.
+
+   `filter` y `transform` no reflujan, de modo que la corrupción no provoca
+   salto de maquetación. Los pasos duros, steps(1, end), evitan que el
+   navegador interpole entre fotogramas y suavice el efecto. */
+@keyframes glitch-aberracion {
+  0% {
+    filter: drop-shadow(3px 0 #ff2e63) drop-shadow(-3px 0 #00e5ff);
+    transform: translate3d(-2px, 0, 0);
+  }
+  14% {
+    filter: drop-shadow(-2px 1px #ff2e63) drop-shadow(2px -1px #00e5ff);
+    transform: translate3d(2px, 0, 0);
+  }
+  28% {
+    filter: drop-shadow(3px -1px #ff2e63) drop-shadow(-3px 1px #00e5ff);
+    transform: translate3d(-1px, 0, 0);
+  }
+  46% {
+    filter: drop-shadow(-2px 0 #ff2e63) drop-shadow(2px 0 #00e5ff);
+    transform: translate3d(1px, 0, 0);
+  }
+  62% {
+    filter: drop-shadow(2px 0 #ff2e63) drop-shadow(-2px 0 #00e5ff);
+    transform: none;
+  }
+  78% {
+    filter: drop-shadow(-1px 0 #ff2e63) drop-shadow(1px 0 #00e5ff);
+    transform: none;
+  }
+  100% {
+    filter: none;
+    transform: none;
+  }
+}
+
+.glitch-contenido {
+  animation: glitch-aberracion var(--glitch-duracion, 760ms) steps(1, end) both;
+}
+
+/* --- capa de corrupción ------------------------------------------------ */
+
+.capa-glitch {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  overflow: hidden;
+  animation: glitch-capa var(--glitch-duracion, 760ms) linear both;
+}
+
+@keyframes glitch-capa {
+  0%,
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Líneas de barrido. Solo durante la transición. */
+.capa-glitch__barrido {
+  position: absolute;
+  inset: -10% 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.38) 0 1px,
+    transparent 1px 4px
+  );
+  animation: glitch-barrido var(--glitch-duracion, 760ms) linear both;
+}
+
+@keyframes glitch-barrido {
+  from {
+    transform: translate3d(0, -6%, 0);
+    opacity: 0.9;
+  }
+  to {
+    transform: translate3d(0, 6%, 0);
+    opacity: 0;
+  }
+}
+
+/* Bandas de canal desplazado. `screen` las suma al fondo sin oscurecerlo. */
+.capa-glitch__banda {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  height: 14vh;
+  mix-blend-mode: screen;
+}
+
+.capa-glitch__banda--magenta {
+  top: 18%;
+  background: linear-gradient(90deg, transparent, rgba(255, 46, 99, 0.42), transparent);
+  animation: glitch-banda-magenta var(--glitch-duracion, 760ms) steps(1, end) both;
+}
+
+.capa-glitch__banda--cian {
+  top: 58%;
+  background: linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.34), transparent);
+  animation: glitch-banda-cian var(--glitch-duracion, 760ms) steps(1, end) both;
+}
+
+@keyframes glitch-banda-magenta {
+  0% {
+    transform: translate3d(-6%, 0, 0);
+    opacity: 0.9;
+  }
+  20% {
+    transform: translate3d(7%, -9vh, 0);
+    opacity: 0.7;
+  }
+  42% {
+    transform: translate3d(-9%, 6vh, 0);
+    opacity: 0.85;
+  }
+  64% {
+    transform: translate3d(4%, -3vh, 0);
+    opacity: 0.4;
+  }
+  80%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes glitch-banda-cian {
+  0% {
+    transform: translate3d(8%, 0, 0);
+    opacity: 0.8;
+  }
+  24% {
+    transform: translate3d(-7%, 7vh, 0);
+    opacity: 0.6;
+  }
+  48% {
+    transform: translate3d(6%, -8vh, 0);
+    opacity: 0.8;
+  }
+  68% {
+    transform: translate3d(-3%, 2vh, 0);
+    opacity: 0.35;
+  }
+  84%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* --- menos movimiento --------------------------------------------------- */
+
+/* La regla global de base.css anula toda animación con
+   `prefers-reduced-motion: reduce`, y eso se queda: nada de aberración,
+   bandas, barrido ni revuelto de caracteres.
+
+   La excepción es el fundido, que sustituye al glitch: una variación de
+   opacidad sin desplazamiento ni parpadeo no es movimiento y no tiene por qué
+   caer con el resto. */
+@media (prefers-reduced-motion: reduce) {
+  .fundido-entrada {
+    animation: fundido-entrada 350ms ease-out both !important;
+  }
+
+  .glitch-contenido {
+    filter: none;
+    transform: none;
+  }
+}

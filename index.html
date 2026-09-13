@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Iconos. El SVG lo usan los navegadores modernos; el PNG es el respaldo
+         para Safari antiguo y para los resultados de búsqueda de Google. -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/icono-32.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <!-- El sitio carga por defecto en la vista CV, que es blanca. -->
+    <meta name="theme-color" content="#FFFFFF" />
+
+    <title>Ivan Gonzalez · Desarrollador de software</title>
+    <meta
+      name="description"
+      content="CV y portafolio de Ivan Gonzalez, desarrollador de software en Puebla, México. C++, Python y sistemas de bajo nivel."
+    />
+    <meta name="author" content="Ivan Gonzalez" />
+    <!-- Las URL van relativas a propósito. El plugin metadatosAbsolutos de
+         vite.config.js las vuelve absolutas y añade og:url y canonical cuando
+         hay dominio, vía VITE_SITIO. Hace falta porque Twitter no resuelve
+         rutas relativas y LinkedIn lo hace de forma inconsistente. En tiempo
+         de ejecución, useMetadatos corrige canonical y og:url a la ruta que se
+         está viendo. -->
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_MX" />
+    <meta property="og:site_name" content="Ivan Gonzalez" />
+    <meta
+      property="og:title"
+      content="Ivan Gonzalez · Desarrollador de software"
+    />
+    <meta
+      property="og:description"
+      content="CV y portafolio de Ivan Gonzalez, desarrollador de software en Puebla, México."
+    />
+    <meta property="og:image" content="/og.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Ivan Gonzalez, desarrollador de software. C++, Python y sistemas de bajo nivel."
+    />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Ivan Gonzalez · Desarrollador de software"
+    />
+    <meta
+      name="twitter:description"
+      content="CV y portafolio de Ivan Gonzalez, desarrollador de software en Puebla, México."
+    />
+    <meta name="twitter:image" content="/og.png" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

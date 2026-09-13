@@ -1,0 +1,62 @@
+# Compila el sitio y lo publica en GitHub Pages.
+#
+# Requiere que en el repositorio, Settings › Pages › Source esté en
+# "GitHub Actions". Con esa opción el artefacto se sirve tal cual y Jekyll no
+# interviene, así que no hace falta ningún .nojekyll.
+
+name: Desplegar en GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Un despliegue a la vez. Sin cancelar el que ya va en camino: se prefiere
+# que termine a dejar Pages a medias.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  construir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+      - run: npm run lint
+
+      - run: npm run build
+        env:
+          # Origen público, para volver absolutas og:image, twitter:image,
+          # og:url y canonical. Sale del propio repositorio y vale mientras el
+          # repo se llame <usuario>.github.io, que es el sitio de usuario.
+          #
+          # Si el usuario tuviera mayúsculas, escribirlo aquí en minúsculas:
+          # las URL de Pages son minúsculas y el canonical debe coincidir.
+          VITE_SITIO: https://${{ github.repository_owner }}.github.io
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  desplegar:
+    needs: construir
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
+      - id: despliegue
+        uses: actions/deploy-pages@v4

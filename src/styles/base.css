@@ -1,0 +1,627 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap");
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  /* Fundido cruzado de tema al cambiar de vista, 350 ms. Lo fija Pagina. */
+  transition:
+    background-color 350ms ease,
+    color 350ms ease;
+}
+
+a {
+  color: inherit;
+}
+
+ul {
+  list-style-type: disc;
+}
+:where(a, button):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Salto al contenido: el sitio abre con el interruptor de vista antes que
+   el encabezado, y con teclado eso obliga a tabular para llegar al texto. */
+.saltar-contenido {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  padding: 10px 16px;
+  z-index: 10;
+}
+.saltar-contenido:focus-visible {
+  left: 12px;
+  top: 12px;
+}
+
+/* Pulso del indicador de disponibilidad. Solo vista Portafolio, ciclo 2 s,
+   sin rebote. */
+@keyframes pulso {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.82);
+  }
+}
+.punto-pulso {
+  animation: pulso 2s ease-in-out infinite;
+}
+
+/* Aparición escalonada de secciones al hacer scroll: 12 px, 400 ms,
+   60 ms entre hermanos, una sola vez. El escalonado lo aplica el
+   componente mediante --retraso. */
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.aparece {
+  opacity: 0;
+}
+.aparece.visible {
+  animation: aparecer 400ms ease-out both;
+  animation-delay: var(--retraso, 0ms);
+}
+
+/* Subrayado que crece de izquierda a derecha, 200 ms. */
+.enlace-crece {
+  position: relative;
+  text-decoration: none;
+}
+.enlace-crece::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 200ms ease;
+}
+.enlace-crece:hover::after,
+.enlace-crece:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* Tarjeta de proyecto: fondo y borde izquierdo al pasar el cursor, 200 ms. */
+.tarjeta {
+  transition:
+    background 200ms ease,
+    border-color 200ms ease;
+}
+
+/* Pie de acción de la tarjeta de proyecto, solo en Portafolio. Una franja
+   partida en dos celdas: el camino interno a la izquierda, el externo a la
+   derecha. Por debajo de 520 px de tarjeta no caben en fila y se apilan, con
+   la línea divisoria cambiando de vertical a horizontal.
+
+   El borde y el fondo se declaran aquí y no en línea porque :hover tiene que
+   poder cambiarlos; el componente solo pasa los colores en variables. La
+   flecha interna avanza en horizontal y la externa en diagonal hacia arriba:
+   la dirección distingue «sigues aquí» de «sales del sitio» sin leer. */
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--acciones-linea);
+  /* Negativos para que la franja llegue a los bordes de la tarjeta: es un pie,
+     no un párrafo dentro del contenido. Coinciden con el relleno de `Entrada`. */
+  margin: 22px -22px -20px;
+}
+
+/* En la página de proyecto no hay tarjeta que sangrar: la franja se cierra
+   sobre sí misma y se queda donde la pongan. */
+.acciones-sueltas {
+  margin: 0;
+  border: 1px solid var(--acciones-linea);
+  border-radius: 3px;
+}
+.accion {
+  flex: 1 1 250px;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 13px 22px;
+  text-decoration: none;
+  color: var(--accion-texto);
+  background: transparent;
+  transition:
+    background 200ms ease,
+    box-shadow 200ms ease;
+}
+
+/* La divisoria entre celdas. `box-shadow` y no `border` para que no sume
+   ancho y las dos celdas midan exactamente lo mismo. */
+.accion + .accion {
+  box-shadow: inset 1px 0 0 var(--acciones-linea);
+}
+
+@media (max-width: 559px) {
+  .accion + .accion {
+    box-shadow: inset 0 1px 0 var(--acciones-linea);
+  }
+}
+.accion:hover,
+.accion:focus-visible {
+  background: var(--accion-fondo);
+}
+.accion-marca,
+.accion-nombre,
+.accion-flecha {
+  transition:
+    color 200ms ease,
+    transform 200ms ease;
+}
+.accion-marca,
+.accion-flecha {
+  color: var(--accion-suave);
+}
+.accion-flecha {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.accion:hover .accion-marca,
+.accion:focus-visible .accion-marca,
+.accion:hover .accion-flecha,
+.accion:focus-visible .accion-flecha,
+.accion:hover .accion-nombre,
+.accion:focus-visible .accion-nombre {
+  color: var(--accion-tinte);
+}
+.accion:hover .accion-flecha,
+.accion:focus-visible .accion-flecha {
+  transform: translateX(3px);
+}
+.accion:hover .accion-flecha-fuera,
+.accion:focus-visible .accion-flecha-fuera {
+  transform: translate(3px, -3px);
+}
+
+/* Vuelta al Portafolio, en la barra de la página de proyecto. La flecha se
+   retira hacia la izquierda: el mismo gesto que la de avanzar, del revés. */
+.volver-flecha {
+  transition: transform 200ms ease;
+}
+.volver:hover,
+.volver:focus-visible {
+  color: var(--volver-tinte, currentColor);
+}
+.volver:hover .volver-flecha,
+.volver:focus-visible .volver-flecha {
+  transform: translateX(-3px);
+}
+
+/* Apartado de la página de proyecto. En pantalla estrecha el rótulo va encima
+   del texto, sin más. A partir de 860 px se parte en dos columnas y el rótulo
+   se queda fijo mientras dura su apartado, de modo que la pregunta que se está
+   respondiendo no se pierde de vista al bajar. */
+.apartado {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  padding: 30px 0 52px;
+}
+
+@media (min-width: 860px) {
+  .apartado {
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: 0 48px;
+  }
+
+  .apartado > h2 {
+    position: sticky;
+    top: 30px;
+    align-self: start;
+  }
+}
+
+/* Retícula de tecnologías de la página de proyecto. `auto-fit` con un mínimo
+   deja que sean tres en escritorio, dos en tableta y una en teléfono sin
+   escribir una sola consulta de medios. */
+.banda-stack {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+}
+.ficha-tec {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 17px 19px;
+  border: 1px solid var(--ficha-linea);
+  border-radius: 3px;
+  transition:
+    background 200ms ease,
+    border-color 200ms ease;
+}
+.ficha-tec:hover {
+  background: var(--ficha-fondo);
+  border-color: var(--ficha-tinte);
+}
+.ficha-tec-icono {
+  display: flex;
+  transition: transform 200ms ease;
+}
+.ficha-tec:hover .ficha-tec-icono {
+  transform: scale(1.08);
+}
+
+/* Decisiones plegadas, sobre <details> nativo. Se le quita el triángulo por
+   omisión, que cada navegador dibuja a su manera, y se pone una flecha propia
+   que gira al abrir. El resto del comportamiento es del navegador y por eso
+   funciona con teclado, con lector de pantalla y con Ctrl+F. */
+.pliegue {
+  border: 1px solid var(--pliegue-linea);
+  border-radius: 3px;
+  transition:
+    background 200ms ease,
+    border-color 200ms ease;
+}
+.pliegue[open],
+.pliegue:hover {
+  border-color: var(--pliegue-tinte);
+}
+.pliegue[open] {
+  background: var(--pliegue-fondo);
+}
+.pliegue-cabecera {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 18px;
+  cursor: pointer;
+  list-style: none;
+}
+
+/* Los dos que hacen falta para matar el triángulo en todos los navegadores. */
+.pliegue-cabecera::-webkit-details-marker {
+  display: none;
+}
+.pliegue-cabecera::marker {
+  content: "";
+}
+.pliegue-numero {
+  flex-shrink: 0;
+  transition: color 200ms ease;
+}
+.pliegue[open] .pliegue-numero,
+.pliegue-cabecera:hover .pliegue-numero {
+  color: var(--pliegue-tinte);
+}
+.pliegue-flecha {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--pliegue-tinte);
+  transition: transform 200ms ease;
+}
+.pliegue[open] .pliegue-flecha {
+  transform: rotate(180deg);
+}
+.pliegue-cuerpo {
+  margin: 0;
+  padding: 0 18px 17px 50px;
+  max-width: 620px;
+}
+
+@media (max-width: 559px) {
+  .pliegue-cuerpo {
+    padding-left: 18px;
+  }
+}
+
+/* Obligatorio, no opcional: con la preferencia activa todo aparece en su
+   estado final sin animación. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .aparece,
+  .aparece.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Los que se mueven por transform quedan en su sitio, no a medio camino. */
+  .accion-flecha,
+  .volver-flecha,
+  .ficha-tec-icono,
+  .pliegue-flecha {
+    transform: none !important;
+  }
+
+  /* Salvo este: girar la flecha es lo único que dice si el pliegue está
+     abierto, y sin ella la señal desaparece. Se hace de golpe, sin animar. */
+  .pliegue[open] .pliegue-flecha {
+    transform: rotate(180deg) !important;
+  }
+}
+.tarjeta:hover {
+  background: var(--tarjeta-fondo-hover, transparent);
+  border-left-color: var(--tarjeta-borde-hover, currentColor);
+}
+
+/* Texto disponible para lectores de pantalla y oculto a la vista. Lo usa el
+   revuelto de caracteres para no leer glifos aleatorios en voz alta. */
+.solo-lectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  clip-path: inset(50%);
+  border: 0;
+}
+
+/* ========================================================================
+   Movimiento ambiente del Portafolio
+   ========================================================================
+
+   Una pieza arriba, que late mientras la página está quieta, y dos abajo, que
+   se trazan al bajar. Ninguna dura más de 600 ms salvo los ciclos lentos de
+   fondo, y todas mueren con `prefers-reduced-motion`. */
+
+/* --- 1. Halo del indicador de disponibilidad ---------------------------- */
+
+/* Anillo que sale del punto y se apaga dentro del mismo ciclo de 2 s. Comparte
+   duración y origen con el pulso a propósito: dos animaciones de distinta
+   duración en el mismo renglón se leen como dos cosas peleando.
+
+   1 px y 50 % de opacidad. Más grueso o más opaco pasa a leerse como un botón,
+   y el punto no es pulsable. Hereda la escala del punto sin corregirla: esa
+   irregularidad es lo que evita que el latido parezca un temporizador. */
+.punto-pulso {
+  position: relative;
+}
+.punto-pulso::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  /* `box-shadow` y no `border`: el borde sumaría 2 px a la caja del punto y
+     lo descolocaría del renglón. */
+  box-shadow: 0 0 0 1px currentColor;
+  animation: halo 2s ease-out infinite;
+}
+
+@keyframes halo {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  70%,
+  100% {
+    transform: scale(2.9);
+    opacity: 0;
+  }
+}
+
+/* --- 2. Regla de sección ------------------------------------------------ */
+
+/* Sobre la línea que cierra cada título de sección se traza un segmento corto
+   con los dos acentos de la casa, magenta a cian. Se dibuja de izquierda a
+   derecha cuando la sección entra en pantalla, justo después de que la propia
+   sección haya terminado de aparecer: primero llega el bloque, luego se marca
+   dónde empieza. Es el mismo gesto del subrayado de los enlaces, a otra
+   escala, así que el sitio no estrena vocabulario.
+
+   El degradado magenta → cian va mezclado a propósito: por separado esos dos
+   colores identifican bloques de experiencia, y aquí no deben confundirse con
+   el tinte de uno. Se acota al 40 % del ancho para que en un teléfono no se
+   coma el renglón entero. */
+.regla-seccion {
+  position: relative;
+}
+.regla-seccion::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  /* Encima de la línea de 1 px del título, no debajo: la tapa, no la duplica. */
+  bottom: -1px;
+  width: 96px;
+  max-width: 40%;
+  height: 1px;
+  background: linear-gradient(90deg, var(--regla-a), var(--regla-b));
+  transform-origin: left;
+}
+
+/* Mientras la sección no ha aparecido, la marca no existe. */
+.aparece .regla-seccion::after {
+  transform: scaleX(0);
+}
+.aparece.visible .regla-seccion::after {
+  animation: trazar 520ms cubic-bezier(0.22, 0.61, 0.36, 1)
+    var(--retraso-regla, 0ms) both;
+}
+
+@keyframes trazar {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* --- Fichas de stack de la tarjeta ------------------------------------- */
+
+/* Al pasar el cursor por la tarjeta, las fichas de tecnología se encienden en
+   cascada de izquierda a derecha, 45 ms entre una y la siguiente. Es la misma
+   acción que ya cambia el fondo y el borde izquierdo, contada con una pieza
+   más: el borde dice cuál es la tarjeta y la cascada recorre lo que contiene.
+
+   Entra escalonada y sale de golpe: el retraso vive solo en la regla de hover,
+   porque una cascada de salida se leería como interfaz con retardo. Con menos
+   movimiento las fichas conmutan sin transición y el hover sigue informando. */
+.chip-stack {
+  color: var(--chip-texto);
+  box-shadow: inset 0 0 0 1px var(--chip-linea);
+  transition:
+    color 200ms ease,
+    box-shadow 200ms ease;
+}
+.tarjeta:hover .chip-stack {
+  color: var(--chip-texto-hover);
+  box-shadow: inset 0 0 0 1px var(--chip-linea-hover);
+  transition-delay: calc(var(--i, 0) * 45ms);
+}
+
+/* --- Marca de la lista de habilidades ---------------------------------- */
+
+/* Solo en Portafolio: el disco nativo desentona en una vista de tipografía
+   monoespaciada y fondo casi negro, y lo sustituye una raya de 6 px, la misma
+   marca corta que separa datos en el resto de la vista.
+
+   Va en `position: absolute` contra el sangrado de la lista para que el término
+   se alinee a una sola vertical aunque ocupe dos renglones; con el marcador
+   nativo, la segunda línea colgaba bajo el disco.
+
+   El CV conserva el disco: en papel blanco es lo que espera quien imprime. */
+.lista-habilidad {
+  list-style: none;
+}
+.lista-habilidad > li {
+  position: relative;
+}
+.lista-habilidad > li::before {
+  content: "";
+  position: absolute;
+  left: -18px;
+  /* A media altura del primer renglón, no del elemento: en un término de dos
+     líneas la marca tiene que quedar junto a la primera. */
+  top: 0.92em;
+  width: 6px;
+  height: 1px;
+  background: var(--habilidad-marca, currentColor);
+}
+
+/* --- 3. Riel de la tarjeta de proyecto ---------------------------------- */
+
+/* Cada tarjeta del Portafolio aparece con el mismo desplazamiento de 12 px que
+   las secciones —el mismo escalonado que se aplica entre hermanos, y las
+   tarjetas de un bloque lo son—, y sobre su borde izquierdo baja una traza del
+   color del bloque que se apaga al llegar abajo.
+
+   Se apaga porque el tinte del borde izquierdo significa «el cursor está
+   aquí»: si la traza se quedara, las cinco tarjetas estarían siempre
+   encendidas. Los 600 ms son el gesto entero, dibujo y apagado.
+
+   La sección de experiencia mide más de una pantalla, así que cada tarjeta
+   lleva su propio observador en lugar de colgarse del de la sección: si no,
+   las de abajo terminarían de animarse antes de que nadie las viera. */
+/* La traza se ancla a la tarjeta, que hasta ahora no tenía posición propia. */
+.riel {
+  position: relative;
+}
+.riel::before {
+  content: "";
+  position: absolute;
+  /* Cubre también las esquinas del borde, que si no asoman en gris. */
+  top: -1px;
+  bottom: -1px;
+  left: -1px;
+  width: 1px;
+  background: var(--riel-tinte, currentColor);
+  /* Neón mínimo: sin el halo la traza de 1 px se pierde sobre el fondo casi
+     negro, y con más se convierte en un tubo fluorescente. */
+  box-shadow: 0 0 6px var(--riel-tinte, currentColor);
+  transform: scaleY(0);
+  transform-origin: top;
+  opacity: 0;
+}
+.riel.visible::before {
+  animation: escaneo 600ms ease-out var(--retraso-riel, 0ms) both;
+}
+
+@keyframes escaneo {
+  0% {
+    transform: scaleY(0);
+    opacity: 0.85;
+  }
+  55% {
+    transform: scaleY(1);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 0;
+  }
+}
+
+/* --- menos movimiento --------------------------------------------------- */
+
+/* --- Fila de título y fecha de una entrada ------------------------------ */
+
+/* Nombre a la izquierda, fecha contra el margen derecho, en el mismo renglón.
+   Es lo que deja leer el borde izquierdo de corrido y consultar las fechas
+   como columna aparte.
+
+   Sin `nowrap` la fecha se descuelga bajo el título en cuanto los dos no caben,
+   y basta un periodo cerrado junto a un nombre largo. Quien cede es el título,
+   que sabe partirse en dos renglones; la fecha partida deja un año colgando.
+
+   En pantalla estrecha sí se apila, que ahí es lo correcto. */
+.fila-titulo {
+  flex-wrap: nowrap;
+}
+.fila-titulo > h3 {
+  min-width: 0;
+}
+.fila-titulo .fecha-entrada {
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .fila-titulo {
+    flex-wrap: wrap;
+  }
+}
+
+/* La regla global de arriba ya apaga toda animación. Falta decidir en qué
+   estado se queda cada pieza, que es lo que distingue «sin animación» de
+   «roto»:
+
+   - El halo desaparece. Congelado sería un anillo fijo alrededor del punto,
+     que parece un foco de teclado donde no hay nada que enfocar.
+   - La regla de sección se queda dibujada: es parte del diseño, no del
+     movimiento, y sin ella la sección pierde su marca.
+   - El riel no se pinta. Era un gesto de paso; sin paso no hay nada que
+     mostrar, y el borde gris de la tarjeta sigue en su sitio. */
+@media (prefers-reduced-motion: reduce) {
+  .punto-pulso::after {
+    display: none;
+  }
+
+  .regla-seccion::after {
+    transform: none !important;
+  }
+}
