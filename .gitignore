@@ -25,3 +25,6 @@ dist-ssr
 
 /pdfs/
 /mds/
+
+# Python
+__pycache__/

@@ -251,8 +251,9 @@ export const CURSOS = [
   },
 ];
 
+/* Sin el español: es la lengua en la que está escrito el CV y declararlo no
+   dice nada que la propia página no demuestre. Queda lo que sí informa. */
 export const IDIOMAS = [
-  { idioma: "Español", nivel: "Nativo" },
   { idioma: "Inglés", nivel: "B2" },
 ];
 
